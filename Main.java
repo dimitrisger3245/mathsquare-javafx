@@ -1,9 +1,10 @@
-package gerovasileioufx; 
+package gerovasileioufx;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -28,7 +29,7 @@ public class Main extends Application {
     private static final int TILE_SIZE = 85;
     private static final int GAP = 6;
 
-    private int size = 3; 
+    private int size = 3;
     private int[][] board;
     private Button[][] buttons;
 
@@ -56,7 +57,6 @@ public class Main extends Application {
         root.setPadding(new Insets(20));
         root.setStyle("-fx-background-color: #2c3e50;");
 
-        
         movesLabel = new Label("Κινήσεις: 0");
         movesLabel.setFont(Font.font("Arial", FontWeight.BOLD, 17));
         movesLabel.setStyle("-fx-text-fill: white;");
@@ -68,7 +68,6 @@ public class Main extends Application {
         HBox statsBox = new HBox(25, movesLabel, timerLabel);
         statsBox.setAlignment(Pos.CENTER);
 
-        
         ComboBox<String> sizeSelector = new ComboBox<>();
         sizeSelector.getItems().addAll("3×3 (8-Puzzle)", "4×4 (15-Puzzle)");
         sizeSelector.setValue("3×3 (8-Puzzle)");
@@ -93,7 +92,6 @@ public class Main extends Application {
         topContainer.setPadding(new Insets(0, 0, 20, 0));
         root.setTop(topContainer);
 
-        
         gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setHgap(GAP);
@@ -101,10 +99,8 @@ public class Main extends Application {
         gridPane.setStyle("-fx-background-color: #34495e; -fx-padding: 12; -fx-background-radius: 8;");
         root.setCenter(gridPane);
 
-        
         setupTimeline();
 
-        
         setupGrid();
         startNewGame();
 
@@ -148,7 +144,6 @@ public class Main extends Application {
         timeline.stop();
         isAnimating = false;
 
-        
         int val = 1;
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
@@ -162,11 +157,11 @@ public class Main extends Application {
             }
         }
 
-        
         int shuffleSteps = (size == 3) ? 150 : 350;
-        shuffleBoard(shuffleSteps);
+        do {
+            shuffleBoard(shuffleSteps);
+        } while (checkWin());
 
-       
         moves = 0;
         secondsElapsed = 0;
         timerLabel.setText("Χρόνος: 0s");
@@ -195,7 +190,6 @@ public class Main extends Application {
         }
     }
 
-
     private void handleTileClick(int r, int c) {
         if (!gameActive || isAnimating || board[r][c] == 0) {
             return;
@@ -209,7 +203,7 @@ public class Main extends Application {
     private void animateAndSwap(int r, int c) {
         isAnimating = true;
         Button clickedBtn = buttons[r][c];
-        clickedBtn.toFront(); 
+        clickedBtn.toFront();
 
         double deltaX = (emptyCol - c) * (TILE_SIZE + GAP);
         double deltaY = (emptyRow - r) * (TILE_SIZE + GAP);
@@ -230,7 +224,7 @@ public class Main extends Application {
             if (checkWin()) {
                 gameActive = false;
                 timeline.stop();
-                showWinAlert();
+                Platform.runLater(this::showWinAlert);
             }
         });
 
@@ -283,22 +277,17 @@ public class Main extends Application {
         return true;
     }
 
-private void showWinAlert() {
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.initOwner(primaryStage);
-    alert.setTitle("Νίκη!");
-    alert.setHeaderText(null);
-    alert.setContentText(
-        "Συγχαρητήρια! Το παζλ (" + size + "×" + size + ") λύθηκε σε " +
-        moves + " κινήσεις και " + secondsElapsed + " δευτερόλεπτα!"
-    );
-    alert.showAndWait();
-}
-
-    public static void main(String[] args) {
-        launch(args);
+    private void showWinAlert() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.initOwner(primaryStage);
+        alert.setTitle("Νίκη!");
+        alert.setHeaderText(null);
+        alert.setContentText(
+            "Congratulations! Puzzle (" + size + "x" + size + ") solved in " +
+            moves + " moves and " + secondsElapsed + " seconds!"
+        );
+        alert.showAndWait();
     }
-}
 
     public static void main(String[] args) {
         launch(args);
