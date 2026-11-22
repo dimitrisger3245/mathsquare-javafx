@@ -19,7 +19,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -284,16 +283,22 @@ public class Main extends Application {
         return true;
     }
 
-    private void showWinAlert() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Νίκη!");
-        alert.setHeaderText(null);
-        alert.setContentText(
-            "Συγχαρητήρια! Το παζλ (" + size + "×" + size + ") λύθηκε σε " +
-            moves + " κινήσεις και " + secondsElapsed + " δευτερόλεπτα!"
-        );
-        alert.showAndWait();
+private void showWinAlert() {
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.initOwner(primaryStage);
+    alert.setTitle("Νίκη!");
+    alert.setHeaderText(null);
+    alert.setContentText(
+        "Συγχαρητήρια! Το παζλ (" + size + "×" + size + ") λύθηκε σε " +
+        moves + " κινήσεις και " + secondsElapsed + " δευτερόλεπτα!"
+    );
+    alert.showAndWait();
+}
+
+    public static void main(String[] args) {
+        launch(args);
     }
+}
 
     public static void main(String[] args) {
         launch(args);
